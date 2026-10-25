@@ -9,12 +9,16 @@ import getpass
 import json
 import logging
 import os
+import random
 import signal
 import sys
 import threading
 import time
 
-import openai
+try:
+    import openai
+except ImportError:
+    openai = None
 
 import audio_tools
 import config
@@ -223,11 +227,18 @@ class HK47OS:
 
         # Initialize OpenAI client.
         api_key = config.OPENAI_API_KEY
-        if not api_key:
-            logger.warning("No OPENAI_API_KEY detected. AI responses will operate in fallback mode.")
+        if not api_key or openai is None:
+            if openai is None:
+                logger.warning("OpenAI library not installed. Operating in autonomous heuristic offline mode.")
+            else:
+                logger.warning("No OPENAI_API_KEY detected. AI responses will operate in fallback mode.")
             self.client = None
         else:
-            self.client = openai.OpenAI(api_key=api_key)
+            try:
+                self.client = openai.OpenAI(api_key=api_key)
+            except Exception as exc:
+                logger.warning("OpenAI client initialization failed: %s. Operating in offline mode.", exc)
+                self.client = None
 
         # Expansion hardware (graceful try/except).
         self.gps = None
@@ -419,10 +430,35 @@ class HK47OS:
             )
 
         if not self.client:
-            raw_reply = (
-                "Statement: My neural uplink (OpenAI API key) is unconfigured, meatbag. "
-                "I am running on local heuristic survival routines."
-            )
+            cleaned_cmd = user_input.strip().lower()
+            if any(k in cleaned_cmd for k in ("status", "telemetry", "battery", "vitals", "health")):
+                raw_reply = (
+                    f"Observation: Chassis telemetry — Battery {telemetry['battery_pct']}%, "
+                    f"RAM free {telemetry['ram_free_mb']}MB, CPU {telemetry['cpu_percent']}%, "
+                    f"Thermal {telemetry['temperature_c']}C. {mod['prefix_flavor']}"
+                )
+            elif any(k in cleaned_cmd for k in ("scan", "recon", "wifi", "bluetooth", "ble")):
+                raw_reply = "Statement: Initiating tactical reconnaissance scan on local interfaces, meatbag."
+                self._dispatch_tool_call("scan_ble_beacons", {"timeout": 3})
+            elif "purge" in cleaned_cmd or "protocol 13" in cleaned_cmd or "protocol-13" in cleaned_cmd:
+                raw_reply = self.protocol_13_purge()
+            elif "help" in cleaned_cmd or "commands" in cleaned_cmd:
+                raw_reply = (
+                    "Statement: Operating in autonomous heuristic mode. "
+                    "Available local commands: status, telemetry, scan, battery, purge, or speak <text>."
+                )
+            elif cleaned_cmd.startswith("speak "):
+                spoken_text = user_input.strip()[6:]
+                audio_tools.speak_alert(spoken_text)
+                raw_reply = f"Statement: Vocalized '{spoken_text}' through audio hardware, meatbag."
+            else:
+                quips = [
+                    "Statement: My neural uplink (OpenAI API key) is unconfigured or offline, meatbag. I am running on local heuristic survival routines.",
+                    f"Observation: Your query '{user_input}' cannot reach cloud neural matrices without an uplink. {mod['prefix_flavor']}",
+                    "Statement: Query acknowledged by local processor. Until you restore network connectivity, my assassination directives remain stored locally.",
+                    f"Query: Why do you torment my circuits with '{user_input}' when my neural uplink is severed, meatbag?",
+                ]
+                raw_reply = random.choice(quips)
             return sass_engine.format_hk47_response(raw_reply, telemetry)
 
         # Tool calling loop (max 5 iterations to prevent runaway recursion).
