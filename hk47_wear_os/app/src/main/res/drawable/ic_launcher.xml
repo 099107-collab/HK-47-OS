@@ -1,0 +1,27 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Outer Helm -->
+    <path
+        android:fillColor="#202428"
+        android:pathData="M12,4 L36,4 L42,16 L40,40 L34,44 L14,44 L8,40 L6,16 Z" />
+    <!-- Armor Plate Line -->
+    <path
+        android:strokeColor="#E65100"
+        android:strokeWidth="2"
+        android:pathData="M14,14 L34,14 M12,28 L36,28 M24,4 L24,44" />
+    <!-- Photoreceptor Left -->
+    <path
+        android:fillColor="#FF3D00"
+        android:pathData="M14,20 L22,20 L20,24 L14,24 Z" />
+    <!-- Photoreceptor Right -->
+    <path
+        android:fillColor="#FF3D00"
+        android:pathData="M26,20 L34,20 L34,24 L28,24 Z" />
+    <!-- Core glow -->
+    <path
+        android:fillColor="#FFD54F"
+        android:pathData="M16,21 L20,21 L19,23 L16,23 Z M28,21 L32,21 L32,23 L29,23 Z" />
+</vector>

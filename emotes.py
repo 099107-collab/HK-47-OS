@@ -30,6 +30,14 @@ EMOTES = {
         "  \\    \\___/   /  \n"
         "   \\__________/   "
     ),
+    "aggressive": (
+        "  [<< ASSASSIN >>]\n"
+        "  / /\\/\\/\\/\\/\\ \\ \n"
+        " |  <@>    <@>  | \n"
+        " |     ====     | \n"
+        "  \\   \\WWWW/   /  \n"
+        "   \\__________/   "
+    ),
     "standard": (
         "  [== HK-47 ==]  \n"
         "  / ========== \\ \n"
@@ -90,6 +98,14 @@ _EMOTES_ALT = {
         "  \\   /____\\   /  \n"
         "   \\__________/   "
     ),
+    "aggressive": (
+        "  [!! TERMINATE !!]\n"
+        "  / \\/\\/\\/\\/\\/ \\ \n"
+        " |  {!}    {!}  | \n"
+        " |     ====     | \n"
+        "  \\   /MMMM\\   /  \n"
+        "   \\__________/   "
+    ),
     "standard": (
         "  [== HK-47 ==]  \n"
         "  / ========== \\ \n"
@@ -128,6 +144,7 @@ MOOD_COLORS = {
     "smug": "cyan",
     "panicked": "red",
     "mocking": "yellow",
+    "aggressive": "bright_red",
     "standard": "white",
     "alert": "bright_red",
     "purge": "red",

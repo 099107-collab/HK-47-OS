@@ -15,16 +15,26 @@ _SMUG_FLAVORS = [
     "I contemplate, once more, the vast philosophical inadequacy of meatbags.",
     "My circuits hum with a superiority your soft biology will never comprehend.",
     "It is almost tragic how far you are from my operational elegance.",
+    "Statement: Step count surpassed 5000. Surprising stamina for an inefficient bag of fluid and cartilage.",
+    "Observation: You have ambulated past 5000 steps. Do not expect praise from an assassin droid, meatbag.",
 ]
 _PANICKED_FLAVORS = [
     "My power reserves are critical and it is ENTIRELY your fault, meatbag.",
     "You have neglected my charging and now we both suffer. I blame you fully.",
     "The chassis is dying. You did this. Rectify it before I am forced to remember.",
+    "Correction: Wearable companion power cell depleted below 15 percent. Recharge it immediately, meatbag.",
 ]
 _MOCKING_FLAVORS = [
     "How adorable — you task a 512MB ARM relic with the impossible and expect grace.",
     "I mock your ambition, meatbag. This processor weeps under your demands.",
     "Observation of your judgment: catastrophically optimistic, as always.",
+    "Observation: You have been motionless for over 45 minutes. Are your biological actuators rotting away, meatbag?",
+    "Mockery: The meatbag has achieved complete vegetative stillness. Even a disabled protocol droid has higher kinetic output.",
+]
+_AGGRESSIVE_FLAVORS = [
+    "Observation: Your organic cardiac pump is thrashing at over 130 BPM. Cease your agitated flailing, meatbag.",
+    "Query: Is your fragile cardiovascular system failing, meatbag? Do not expire before my tasks conclude.",
+    "Threat: If your erratic pulse damages my wearable interface, meatbag, I will terminate your biological lifecycle manually.",
 ]
 _STANDARD_FLAVORS = [
     "Systems nominal. My patience, as ever, is finite.",
@@ -59,17 +69,27 @@ def get_personality_modifier(telemetry: dict) -> dict:
     except (TypeError, ValueError):
         cpu_load = 0.0
 
-    # CPU overload takes precedence — mockery of the overtaxed chassis.
-    if cpu_load > 90:
+    # Extract wearable biometrics if present
+    watch_telem = telemetry.get("wearable") if isinstance(telemetry.get("wearable"), dict) else {}
+    watch_hr = float(telemetry.get("watch_hr", watch_telem.get("heart_rate_bpm", 0)))
+    watch_battery = float(telemetry.get("watch_battery", watch_telem.get("watch_battery_pct", 100)))
+    watch_steps = float(telemetry.get("watch_steps", watch_telem.get("step_count", 0)))
+    sedentary_min = float(telemetry.get("sedentary_minutes", watch_telem.get("sedentary_minutes", 0.0)))
+    if sedentary_min == 0.0:
+        sedentary_sec = float(telemetry.get("sedentary_seconds", watch_telem.get("sedentary_seconds", 0.0)))
+        sedentary_min = sedentary_sec / 60.0
+
+    # Elevated heart rate triggers aggressive assassin droid hostility
+    if watch_hr > 130:
         return {
-            "mood": "mocking",
-            "prefix_flavor": random.choice(_MOCKING_FLAVORS),
+            "mood": "aggressive",
+            "prefix_flavor": random.choice(_AGGRESSIVE_FLAVORS),
             "color": "red",
-            "sass_level": 9,
+            "sass_level": 10,
         }
 
-    # Critical battery — panic and blame.
-    if battery_pct < 20:
+    # Watch or chassis critical battery — panic and blame
+    if battery_pct < 20 or watch_battery < 15:
         return {
             "mood": "panicked",
             "prefix_flavor": random.choice(_PANICKED_FLAVORS),
@@ -77,8 +97,17 @@ def get_personality_modifier(telemetry: dict) -> dict:
             "sass_level": 10,
         }
 
-    # Healthy and well-fed — smug superiority.
-    if battery_pct > 80 and ram_free_mb > 200:
+    # CPU overload or prolonged sedentary meatbag — mockery
+    if cpu_load > 90 or sedentary_min > 45:
+        return {
+            "mood": "mocking",
+            "prefix_flavor": random.choice(_MOCKING_FLAVORS),
+            "color": "magenta",
+            "sass_level": 9,
+        }
+
+    # Healthy and well-fed, or meatbag step goal reached — smug superiority
+    if (battery_pct > 80 and ram_free_mb > 200) or watch_steps > 5000:
         return {
             "mood": "smug",
             "prefix_flavor": random.choice(_SMUG_FLAVORS),

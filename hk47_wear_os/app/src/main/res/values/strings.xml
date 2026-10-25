@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">HK-47 Companion</string>
+    <string name="watch_face_name">HK-47 Assassin Droid Face</string>
+    <string name="hk47_default_quote">Statement: Observation of pathetic organic meatbag initiated.</string>
+    <string name="mood_standard">STANDARD</string>
+    <string name="mood_smug">SMUG</string>
+    <string name="mood_mocking">MOCKING</string>
+    <string name="mood_panicked">PANICKED</string>
+    <string name="mood_aggressive">AGGRESSIVE</string>
+</resources>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="hk47_bg">#0A0A0E</color>
+    <color name="hk47_titanium">#202428</color>
+    <color name="hk47_steel">#3A4048</color>
+    <color name="hk47_rust_orange">#E65100</color>
+    <color name="hk47_photoreceptor_glow">#FF3D00</color>
+    <color name="hk47_photoreceptor_core">#FFD54F</color>
+    <color name="hk47_aggressive_red">#D50000</color>
+    <color name="hk47_smug_cyan">#00E5FF</color>
+    <color name="hk47_mocking_purple">#AA00FF</color>
+    <color name="hk47_panicked_yellow">#FFD600</color>
+    <color name="hk47_ambient_gray">#888888</color>
+    <color name="hk47_text_white">#F0F0F0</color>
+</resources>

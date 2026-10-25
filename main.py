@@ -29,6 +29,7 @@ import os_tools
 import recon_tools
 import sass_engine
 import security_tools
+import wearable_bridge
 
 # Configure logging to disk so stdout stays clean for TUI.
 os.makedirs(config.HK47_HOME, exist_ok=True)
@@ -197,6 +198,96 @@ FUNCTION_SCHEMAS = [
             "parameters": {"type": "object", "properties": {}, "required": []},
         },
     },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_wearable_telemetry",
+            "description": "Read real-time biometric vitals from the Wear OS smartwatch companion: heart rate (BPM), step count, watch battery level, and sedentary timer.",
+            "parameters": {"type": "object", "properties": {}, "required": []},
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "send_wearable_alert",
+            "description": "Transmit a notification text and haptic vibration pattern to the meatbag's Wear OS smartwatch display.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "description": "The alert message to display on the watch screen.",
+                    },
+                    "title": {
+                        "type": "string",
+                        "description": "Optional title for the notification (default 'HK-47 ALERT').",
+                    },
+                    "haptic": {
+                        "type": "string",
+                        "enum": ["SINGLE_BLIP", "DOUBLE_STRIKE", "ALARM_STACCATO", "CALMING_WAVE", "PROTOCOL_13_PURGE"],
+                        "description": "The haptic vibration profile to trigger.",
+                    },
+                },
+                "required": ["message"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "speak_on_wearable",
+            "description": "Vocalize an HK-47 speech line directly through the Wear OS smartwatch speaker using its robotic TTS engine.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "description": "The phrase to speak aloud on the watch.",
+                    }
+                },
+                "required": ["message"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "trigger_wearable_haptic",
+            "description": "Pulse the Wear OS smartwatch haptic vibration motor with a calibrated HK-47 pattern.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "pattern": {
+                        "type": "string",
+                        "enum": ["SINGLE_BLIP", "DOUBLE_STRIKE", "ALARM_STACCATO", "CALMING_WAVE", "PROTOCOL_13_PURGE"],
+                        "description": "The haptic profile to pulse on the watch.",
+                    }
+                },
+                "required": ["pattern"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "connect_wearable_watch",
+            "description": "Establish a wireless ADB connection to the Wear OS smartwatch over Wi-Fi.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "ip": {
+                        "type": "string",
+                        "description": "IP address of the Wear OS watch on the local network.",
+                    },
+                    "port": {
+                        "type": "integer",
+                        "description": "TCP port for ADB (default 5555).",
+                    },
+                },
+                "required": ["ip"],
+            },
+        },
+    },
 ]
 
 
@@ -295,6 +386,14 @@ class HK47OS:
         }
         self.input_listener = input_listener.KeyMacroListener(callbacks=macros)
 
+        # Initialize Wearable Bridge.
+        try:
+            self.wearable = wearable_bridge.get_bridge()
+            logger.info("Wearable bridge initialized.")
+        except Exception as exc:
+            logger.warning("Wearable bridge init failed: %s", exc)
+            self.wearable = None
+
         # Conversation history.
         self.conversation_history = [
             {"role": "system", "content": config.HK47_SYSTEM_PROMPT}
@@ -389,6 +488,28 @@ class HK47OS:
             if self.gps:
                 return json.dumps(self.gps.get_location())
             return json.dumps({"status": "simulated", "lat": 0.0, "lon": 0.0})
+
+        if name == "get_wearable_telemetry":
+            return json.dumps(wearable_bridge.get_wearable_telemetry())
+
+        if name == "send_wearable_alert":
+            msg = args.get("message", "")
+            title = args.get("title", "HK-47 ALERT")
+            haptic = args.get("haptic", "DOUBLE_STRIKE")
+            return wearable_bridge.send_wearable_alert(msg, title=title, haptic=haptic)
+
+        if name == "speak_on_wearable":
+            msg = args.get("message", "")
+            return wearable_bridge.speak_on_wearable(msg)
+
+        if name == "trigger_wearable_haptic":
+            pattern = args.get("pattern", "SINGLE_BLIP")
+            return wearable_bridge.trigger_wearable_haptic(pattern)
+
+        if name == "connect_wearable_watch":
+            ip = args.get("ip", config.WEARABLE_WATCH_IP)
+            port = args.get("port", 5555)
+            return wearable_bridge.connect_wearable_watch(ip, port=port)
 
         return f"Correction: Unrecognized tool '{name}', meatbag."
 
@@ -491,6 +612,11 @@ class HK47OS:
         self.watchdog.stop()
         self.commentary.stop()
         self.input_listener.stop()
+        if hasattr(self, "wearable") and self.wearable:
+            try:
+                self.wearable.stop()
+            except Exception:
+                pass
         if self.gps:
             self.gps.stop()
         if self.tripwire:

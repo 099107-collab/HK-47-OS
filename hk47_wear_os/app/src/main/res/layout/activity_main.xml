@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/hk47_bg"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <!-- Title / Header -->
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="HK-47 COMPANION"
+            android:textColor="@color/hk47_rust_orange"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <!-- Mood Status Pill -->
+        <TextView
+            android:id="@+id/tvMood"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:background="@color/hk47_titanium"
+            android:paddingStart="8dp"
+            android:paddingTop="2dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="2dp"
+            android:text="MOOD: STANDARD"
+            android:textColor="@color/hk47_photoreceptor_glow"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
+        <!-- Photoreceptor ASCII visualizer -->
+        <TextView
+            android:id="@+id/tvEyes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:fontFamily="monospace"
+            android:gravity="center"
+            android:text="[ •_• ]"
+            android:textColor="@color/hk47_photoreceptor_core"
+            android:textSize="20sp" />
+
+        <!-- Biometrics Container -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <!-- Heart Rate -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvHeartRate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="-- BPM"
+                    android:textColor="@color/hk47_aggressive_red"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="MEATBAG HR"
+                    android:textColor="@color/hk47_ambient_gray"
+                    android:textSize="9sp" />
+            </LinearLayout>
+
+            <!-- Steps -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvSteps"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textColor="@color/hk47_smug_cyan"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="STEPS"
+                    android:textColor="@color/hk47_ambient_gray"
+                    android:textSize="9sp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Speech / Status Log -->
+        <TextView
+            android:id="@+id/tvSpeech"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@color/hk47_titanium"
+            android:padding="8dp"
+            android:text="Statement: Organic telemetry link active."
+            android:textColor="@color/hk47_text_white"
+            android:textSize="11sp" />
+
+        <!-- Pocket CHIP Connection Status -->
+        <TextView
+            android:id="@+id/tvBridgeStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="CHIP LINK: WAITING (BLE/WIFI)"
+            android:textColor="@color/hk47_ambient_gray"
+            android:textSize="10sp" />
+
+        <!-- Interactive Buttons -->
+        <Button
+            android:id="@+id/btnProvoke"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:layout_marginTop="8dp"
+            android:backgroundTint="@color/hk47_rust_orange"
+            android:text="PROVOKE DROID"
+            android:textColor="@color/hk47_text_white"
+            android:textSize="10sp" />
+
+        <Button
+            android:id="@+id/btnProtocol13"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="16dp"
+            android:backgroundTint="@color/hk47_aggressive_red"
+            android:text="PROTOCOL 13 PURGE"
+            android:textColor="@color/hk47_text_white"
+            android:textSize="10sp" />
+
+    </LinearLayout>
+</ScrollView>

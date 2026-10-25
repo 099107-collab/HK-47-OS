@@ -162,6 +162,12 @@ class HK47TUI:
 
         status_line = f" {now_str} | {bat_str} | CPU: {cpu}% | RAM-FREE: {ram}MB | {temp_str}"
 
+        # Append Wear OS smartwatch biometric HUD if connected
+        if telemetry.get("watch_connected"):
+            w_hr = telemetry.get("watch_hr", 0)
+            w_steps = telemetry.get("watch_steps", 0)
+            status_line += f" | WATCH: {w_hr}BPM/{w_steps}st"
+
         # Color the status red if battery is critical or temp is high.
         bat_val = telemetry.get("battery_pct", 50)
         is_alert = (isinstance(bat_val, (int, float)) and bat_val < 20) or (

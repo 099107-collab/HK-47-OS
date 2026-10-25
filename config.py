@@ -71,6 +71,20 @@ IR_GPIO_PIN = 17
 TRIPWIRE_GPIO_PIN = 27
 
 # ---------------------------------------------------------------------------
+# Wear OS Smartwatch Companion Bridge
+# ---------------------------------------------------------------------------
+WEARABLE_BRIDGE_ENABLED = True
+WEARABLE_PORT = 4747
+WEARABLE_WATCH_IP = os.environ.get("HK47_WATCH_IP", "192.168.1.150")
+WEARABLE_WATCH_PORT = 5555
+WEARABLE_BLE_MAC = os.environ.get("HK47_WATCH_BLE_MAC", None)
+WEARABLE_UUID_SERVICE = "484b3437-0001-4149-4745-4e5400000000"
+
+HR_ALERT_THRESHOLD = 130
+SEDENTARY_ALERT_MINUTES = 45
+STEP_GOAL = 5000
+
+# ---------------------------------------------------------------------------
 # Command execution whitelist
 # ---------------------------------------------------------------------------
 ALLOWED_COMMANDS = [
@@ -92,6 +106,10 @@ ALLOWED_COMMANDS = [
     "cat /proc/cpuinfo",
     "cat /proc/meminfo",
     "cat /proc/loadavg",
+    "adb devices",
+    "adb connect",
+    "adb disconnect",
+    "adb shell dumpsys battery",
 ]
 
 # ---------------------------------------------------------------------------

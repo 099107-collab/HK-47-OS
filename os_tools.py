@@ -11,6 +11,11 @@ import time
 
 import config
 
+try:
+    import wearable_bridge
+except ImportError:
+    wearable_bridge = None
+
 
 # ---------------------------------------------------------------------------
 # Low-level helpers
@@ -180,6 +185,20 @@ def get_system_telemetry() -> dict:
         "disk_pct": disk_pct,
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S"),
     }
+
+    if wearable_bridge is not None:
+        try:
+            w_telem = wearable_bridge.get_wearable_telemetry()
+            telemetry["wearable"] = w_telem
+            telemetry["watch_connected"] = w_telem.get("connected", False)
+            telemetry["watch_hr"] = w_telem.get("heart_rate_bpm", 0)
+            telemetry["watch_steps"] = w_telem.get("step_count", 0)
+            telemetry["watch_battery"] = w_telem.get("watch_battery_pct", 100)
+            telemetry["sedentary_seconds"] = w_telem.get("sedentary_seconds", 0)
+            telemetry["sedentary_minutes"] = w_telem.get("sedentary_minutes", 0.0)
+        except Exception:
+            pass
+
     return telemetry
 
 

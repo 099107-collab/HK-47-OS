@@ -48,11 +48,21 @@ An autonomous, snarky assassin-droid AI Operating System engineered for the **Po
    - **RF Transceiver (`rf_tools.py`):** 433.92MHz packet sniffing via Texas Instruments CC1101 on SPI (`/dev/spidev0.0`).
    - **Tamper Tripwire (`tripwire.py`):** GPIO chassis-intrusion monitoring. Triggers audio alarms and executes Protocol-13.
 
-5. **Security & Protocol-13 (`security_tools.py`)**
+5. **Wear OS Smartwatch Companion Bridge (`wearable_bridge.py`, `hk47_wear_os/`)**
+   - **Wireless ADB / BLE Telemetry Bridge:** Connects to circular Wear OS smartwatches (Fossil, TicWatch, Moto 360, etc.) over Wi-Fi (port 5555) or Bluetooth.
+   - **Biometric Vitals Stream:** Real-time extraction of heart rate (PPG), step counts, and sedentary intervals.
+   - **Biometric Mood Triggers:**
+     - Heart Rate > 130 BPM: **Aggressive** assassin state (demands meatbag regulate their failing pump).
+     - Sedentary > 45 minutes: **Mocking** state (ridicules vegetative organic stillness).
+     - Steps > 5,000: **Smug** state (bemused by biped stamina).
+     - Watch Battery < 15%: **Panicked** state (demands immediate recharging).
+   - **On-Wrist Remote Execution:** Pocket CHIP triggers watch haptic vibration patterns (Single Blip, Double Strike, Alarm Staccato, Calming Wave, Protocol 13 Purge) and vocalizes HK-47 speech lines through the watch speaker.
+
+6. **Security & Protocol-13 (`security_tools.py`)**
    - SQLite encrypted vault secured with **Fernet (AES-128-CBC + HMAC-SHA256)** and PBKDF2HMAC key derivation.
    - **Protocol-13 Purge:** 7-pass cryptographically random shredding of the vault database and key files, followed by deletion of all bytecode caches and temp files.
 
-6. **Audio & Visual Immersion (`audio_tools.py`, `emotes.py`, `hk47_tui.py`)**
+7. **Audio & Visual Immersion (`audio_tools.py`, `emotes.py`, `hk47_tui.py`)**
    - Procedural in-memory PCM sine-wave sound effects via `aplay`.
    - Robotic vocal synthesis via `espeak` (pitch=20, rate=150).
    - 480x272 responsive Urwid TUI with live ASCII face animations, system telemetry bar, and prompt.
@@ -124,6 +134,7 @@ hk47_os/
 ├── daemon.py                  # Hardware watchdog & safety monitor
 ├── cron_daemon.py             # Idle snark & commentary generator
 ├── input_listener.py          # evdev keyboard chord daemon
+├── wearable_bridge.py         # Wear OS smartwatch ADB/BLE/Socket companion bridge
 ├── hk47_tui.py                # 480x272 Urwid terminal layout
 ├── main.py                    # Master orchestrator & OpenAI tool dispatcher
 ├── install.sh                 # Systemd service installer & dependency setup
