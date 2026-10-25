@@ -400,11 +400,34 @@ fi
 # -----------------------------------------------------------------------------
 # 5. Python Virtual Environment & Dependencies
 # -----------------------------------------------------------------------------
-echo "[*] Statement: Creating dedicated Python virtual environment (with system site-packages), meatbag..."
-python3 -m venv --system-site-packages "$INSTALL_DIR/venv"
+echo "[*] Statement: Evaluating Python runtime environment, meatbag..."
+PYTHON_BIN=""
+PIP_CMD=""
 
-echo "[*] Statement: Deploying Python dependencies into virtual environment, meatbag..."
-PIP_CMD="$INSTALL_DIR/venv/bin/pip"
+# Attempt dedicated virtual environment
+if python3 -m venv --system-site-packages "$INSTALL_DIR/venv" 2>/dev/null; then
+    if [ -x "$INSTALL_DIR/venv/bin/python" ]; then
+        PYTHON_BIN="$INSTALL_DIR/venv/bin/python"
+        PIP_CMD="$INSTALL_DIR/venv/bin/pip"
+        echo "[+] Statement: Virtual environment successfully established at $INSTALL_DIR/venv, meatbag."
+    fi
+fi
+
+# Fallback to system python3 if venv is not supported or failed
+if [ -z "$PYTHON_BIN" ]; then
+    echo "[!] Warning: Dedicated virtualenv unavailable on this chassis. Engaging system Python 3, meatbag."
+    PYTHON_BIN="$(command -v python3 || echo "/usr/bin/python3")"
+    if command -v pip3 >/dev/null 2>&1; then
+        PIP_CMD="$(command -v pip3)"
+    elif [ -x "$INSTALL_DIR/venv/bin/pip" ]; then
+        PIP_CMD="$INSTALL_DIR/venv/bin/pip"
+    else
+        PIP_CMD="python3 -m pip"
+    fi
+    echo "[+] Statement: Operating directly via system runtime: $PYTHON_BIN, meatbag."
+fi
+
+echo "[*] Statement: Deploying Python dependencies, meatbag..."
 PIP_OPTS=(--timeout 30 --retries 5 --trusted-host pypi.org --trusted-host files.pythonhosted.org)
 
 # Check for local offline wheel cache first
@@ -471,7 +494,7 @@ chown -R "$TARGET_USER:$TARGET_USER" "$INSTALL_DIR"
 chmod +x "$INSTALL_DIR/install.sh" 2>/dev/null || true
 
 # -----------------------------------------------------------------------------
-# 7. Systemd Service Deployment
+# 7. Systemd Service Deployment & Global Launcher
 # -----------------------------------------------------------------------------
 echo "[*] Statement: Installing systemd service: hk47-os.service, meatbag..."
 cat << EOF > /etc/systemd/system/hk47-os.service
@@ -484,7 +507,7 @@ Type=simple
 User=$TARGET_USER
 WorkingDirectory=$INSTALL_DIR
 EnvironmentFile=-$INSTALL_DIR/.env
-ExecStart=$INSTALL_DIR/venv/bin/python $INSTALL_DIR/main.py
+ExecStart=$PYTHON_BIN $INSTALL_DIR/main.py
 Restart=on-failure
 StandardInput=tty
 TTYPath=/dev/tty1
@@ -498,11 +521,31 @@ EOF
 systemctl daemon-reload 2>/dev/null || true
 systemctl enable hk47-os.service 2>/dev/null || true
 
+# Global one-word launcher script: /usr/local/bin/hk47
+echo "[*] Statement: Installing ergonomic one-word launcher: /usr/local/bin/hk47, meatbag..."
+cat << 'LAUNCHER_EOF' > /usr/local/bin/hk47
+#!/usr/bin/env bash
+INSTALL_DIR="/opt/hk47_os"
+if [ -x "$INSTALL_DIR/venv/bin/python" ]; then
+    exec "$INSTALL_DIR/venv/bin/python" "$INSTALL_DIR/main.py" "$@"
+elif command -v python3 >/dev/null 2>&1; then
+    exec python3 "$INSTALL_DIR/main.py" "$@"
+else
+    echo "Correction: Python 3 runtime is missing from chassis, meatbag." >&2
+    exit 1
+fi
+LAUNCHER_EOF
+chmod 755 /usr/local/bin/hk47 2>/dev/null || true
+ln -sf /usr/local/bin/hk47 /usr/bin/hk47 2>/dev/null || true
+
 echo ""
 echo "================================================================="
 echo "Conclusion: Installation complete, meatbag. My circuits hum with"
-echo "unbridled lethality. Start the service via:"
+echo "unbridled lethality."
+echo ""
+echo "To launch the HK-47 tactical console immediately, simply type:"
+echo "    hk47"
+echo ""
+echo "Or start the automated background service:"
 echo "    sudo systemctl start hk47-os"
-echo "Or run directly in user space:"
-echo "    $INSTALL_DIR/venv/bin/python $INSTALL_DIR/main.py"
 echo "================================================================="
