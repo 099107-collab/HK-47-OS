@@ -1,0 +1,17 @@
+# Core LLM Uplink
+openai>=1.30.0,<2.0.0
+
+# Terminal UI & Formatting
+urwid>=2.6.0,<3.0.0
+rich>=13.7.0,<14.0.0
+
+# Security & Encryption
+cryptography>=41.0.0,<45.0.0
+
+# Hardware & Serial (UART GPS, SPI CC1101, Linux Input)
+pyserial>=3.5,<4.0
+evdev>=1.6.0,<2.0.0
+
+# Optional Embedded Hardware Drivers (installable on ARM/Linux boards)
+# spidev>=3.6
+# RPi.GPIO>=0.7.1
